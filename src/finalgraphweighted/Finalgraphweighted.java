@@ -46,7 +46,6 @@ import weka.core.Instances;
 public class Finalgraphweighted {
 
     public static DoubleMatrix signal_similarity(int nodeCount, int t, DoubleMatrix adjMatrix) {
-//       Matrix I= adjMatrix.factory().createConstantMatrix(nodeCount, nodeCount, 1);
 
         DoubleMatrix I = DoubleMatrix.eye(nodeCount);
 
@@ -70,9 +69,7 @@ public class Finalgraphweighted {
                 signalMatrix.put(j2, i, signalMatrix.get(j2, i) / s);
             }
         }
-//        signalMatrix.print();
         return signalMatrix;
-        // generate_n2nSim();
     }
 
     public static double[] pageRank(DoubleMatrix m) {
@@ -81,7 +78,6 @@ public class Finalgraphweighted {
                 = new DirectedWeightedPseudograph<String, DefaultWeightedEdge>(DefaultWeightedEdge.class);
 
         double[] page_rank = new double[m.rows];
-//        System.out.println(m.rows);
         int k = 0;
         for (int i = 0; i < m.rows; i++) {
             g.addVertex("" + i);
@@ -101,7 +97,6 @@ public class Finalgraphweighted {
         for (int i = 0; i < m.rows; i++) {
 
             page_rank[i] = pr.getVertexScore("" + i);
-//            System.out.println(page_rank[i]);
         }
         return page_rank;
     }
@@ -132,7 +127,6 @@ public class Finalgraphweighted {
 
         Arrays.sort(keys);
 
-//System.out.println(Arrays.toString(keys));
         for (int l = 1; l <= k; l++) {
             neighbor.add(distanceNode.get(keys[l]));
         }
@@ -170,7 +164,8 @@ public class Finalgraphweighted {
             }
             bw.flush();
         } catch (IOException e) {
-            //why does the catch need its own curly?
+            // Prints what exception has been thrown 
+            System.out.println(e);
         }
     }
 
@@ -217,7 +212,6 @@ public class Finalgraphweighted {
      * @param args the command line arguments
      */
     public static void main(String[] args) throws Exception {
-        // TODO code application logic here
 
         Scanner scanner = new Scanner(System.in);
         System.out.print("Enter dataset name: ");
@@ -267,7 +261,7 @@ public class Finalgraphweighted {
                     }
                     if (currentToken.equals("value")) {
                         w = Integer.parseInt(st.nextToken());
-//
+
                     }
 
                     if (currentToken.equals("edge")) {
@@ -292,7 +286,6 @@ public class Finalgraphweighted {
             adjMatrix = new DoubleMatrix(nodeCount, nodeCount);
             signalMatrix = new DoubleMatrix(nodeCount, nodeCount);
             int row = 0, col = 0, weight = 0;
-            //System.out.println(nodeCount);
             for (int i = 0; i < arr.size(); i += 3) {
 
                 row = arr.get(i);
@@ -306,11 +299,11 @@ public class Finalgraphweighted {
 
                 }
             }
-            //  normalizeColumns(adjMatrix);
+
             signalMatrix = signal_similarity(nodeCount, 3, adjMatrix);
-//            
+            
             signalMatrix.transpose();
-//            
+           
             writeMatrix(dataset + ".arff", signalMatrix, dataset);
             double[] page_ranks = new double[nodeCount];
             page_ranks = pageRank(signalMatrix);
@@ -318,30 +311,11 @@ public class Finalgraphweighted {
             DoubleMatrix disMatrix = new DoubleMatrix(nodeCount, nodeCount);
             double[] distance_result = new double[nodeCount];
 
-//            double temp = 0.0, minDist = 10000000000000.0;
-//            int index = 0;
-//            for (int m = 0; m < nodeCount; m++) {
-//                for (int n = 0; n < nodeCount; n++) {
-//                    if (page_ranks[n] > page_ranks[m]) {
-//                        temp = distance(signalMatrix, m, n);
-//                        if (temp < minDist) {
-//                            minDist = temp;
-//                            index = n;
-//                        }
-//                    }
-//                }
-//                disMatrix.put(m, index, minDist);
-////                System.out.println("row "+m+" column "+index+" value "+minDist);
-//                distance_result[m] = minDist;
-//                minDist = 10000000000000.0;
-//            }
             Hashtable PagerankNode = new Hashtable();
             Hashtable NodePagerank = new Hashtable();
             Hashtable ScoreNode = new Hashtable();
 
-//            System.out.println("Node\tPage Rank\t\tDistance");
             for (int c = 0; c < nodeCount; c++) {
-//                System.out.println(c + "\t" + page_ranks[c] + "\t" + distance_result[c]);
                 PagerankNode.put(page_ranks[c], c);
                 NodePagerank.put(c, page_ranks[c]);
 
@@ -349,19 +323,12 @@ public class Finalgraphweighted {
 
             Arrays.sort(page_ranks);
             double tempe;
-//reverse the array of sorted page rank
-//            for (int i = 0; i < nodeCount / 2; i++) {
-//                tempe = page_ranks[i];
-//                page_ranks[i] = page_ranks[nodeCount - 1 - i];
-//                page_ranks[nodeCount - 1 - i] = tempe;
-//            }
 
             ArrayList selected = new ArrayList();
 
             ArrayList neighbor = new ArrayList();
             int a = page_ranks.length;
             a--;
-//            System.out.println(page_ranks[a]);
 
             double[] distance_temp = new double[nodeCount];
             double[] score_temp = new double[nodeCount];
@@ -371,7 +338,7 @@ public class Finalgraphweighted {
             int oldsize, index, newsize = 0;
             do {
                 NodePagerank.put(selectedItem, (double) 0);
-//                     
+                    
                 neighbor.addAll(knearestneighbor(signalMatrix, selectedItem, nodeCount,2));
 
                 oldsize = selected.size();
@@ -384,7 +351,6 @@ public class Finalgraphweighted {
                         if (tempdist < minDist) {
                             minDist = tempdist;
                         }
-//                        distance_temp[i] = distance(signalMatrix, tempSelectedItem, i);
                     }
                     score_temp[i] = minDist * (double) NodePagerank.get(i);
                     ScoreNode.put(score_temp[i], i);
@@ -392,30 +358,18 @@ public class Finalgraphweighted {
 
                 }
                 Arrays.sort(score_temp);
-//
-//                for (int i = 0; i < nodeCount / 2; i++) {
-//                    tempe = score_temp[i];
-//                    score_temp[i] = score_temp[nodeCount - 1 - i];
-//                    score_temp[nodeCount - 1 - i] = tempe;
-//                }
+
                 int maxscorecount = nodeCount;
-//                maxscorecount--;
 
                 selectedItem = (int) ScoreNode.get(score_temp[--maxscorecount]);
                 while (neighbor.contains(selectedItem) && maxscorecount > 0) {
                     maxscorecount--;
                     selectedItem = (int) ScoreNode.get(score_temp[maxscorecount]);
-//                    maxscorecount++;
                 }
-//                if (maxscorecount != nodeCount) {
                 if (!selected.contains(selectedItem)) {
 
                     selected.add(selectedItem);
-//                          array = ArrayUtils.removeElement(array, element)
                 }
-//System.out.println("seeds are :" +selected.toString());
-
-//                }
                 newsize = selected.size();
             } while (newsize > oldsize);
 
